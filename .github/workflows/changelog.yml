@@ -2,6 +2,7 @@
 name: changelog
 on:
   pull_request:
+  workflow_dispatch:
 
 jobs:
   changelog-check:
