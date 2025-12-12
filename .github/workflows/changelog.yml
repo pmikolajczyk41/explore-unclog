@@ -1,0 +1,36 @@
+---
+name: changelog
+on:
+  pull_request:
+
+jobs:
+  changelog-check:
+    name: Check if changelog is updated
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 10
+          persist-credentials: true
+
+      - name: Detect changes
+        id: changed
+        uses: tj-actions/changed-files@v46.0.5
+        with:
+          files_yaml: |
+            changelog:
+              - 'changelog/**.md'
+
+      - name: Download unclog binary
+        uses: dsaltares/fetch-gh-release-asset@1.1.2
+        with:
+          repo: OffchainLabs/unclog
+          version: "tags/v0.1.5"
+          file: "unclog"
+
+      - name: Check changelog fragments
+        env:
+          ALL_ADDED_MARKDOWN: ${{ steps.changed.outputs.changelog_added_files }}
+        run: chmod +x unclog && ./unclog check -fragment-env=ALL_ADDED_MARKDOWN
